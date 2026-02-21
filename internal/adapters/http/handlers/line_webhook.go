@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v5"
@@ -13,5 +14,7 @@ func NewLineWebhookHandler() *LineWebhookHandler {
 }
 
 func (h *LineWebhookHandler) Handle(c *echo.Context) error {
+	fmt.Println("Body", c.Request().Body)
+
 	return c.NoContent(http.StatusNoContent)
 }
