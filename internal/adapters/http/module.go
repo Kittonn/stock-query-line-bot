@@ -10,7 +10,6 @@ var Module = fx.Module("http",
 	fx.Provide(
 		NewEcho,
 		NewHTTPServer,
-		NewHandlers,
 	),
 	fx.Invoke(
 		RegisterRoutes,

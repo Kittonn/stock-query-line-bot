@@ -18,7 +18,7 @@ type Config struct {
 
 	// Finnhub API Settings
 	FinnhubAPIKey string `mapstructure:"FINNHUB_API_KEY"`
-	FinnhubAPIURL string `mapstructure:"FINNHUB_API_URL"`
+	FinnhubAPIURL string `mapstructure:"FINNHUB_API_BASE_URL"`
 
 	// Line Messaging API Settings
 	LineChannelSecret      string `mapstructure:"LINE_CHANNEL_SECRET"`
