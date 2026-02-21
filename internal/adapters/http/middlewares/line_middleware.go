@@ -30,7 +30,7 @@ func VerifyLineSignature(channelSecret string) echo.MiddlewareFunc {
 				return echo.NewHTTPError(http.StatusBadRequest, "missing X-Line-Signature header")
 			}
 
-			if !validateSignature(channelSecret, body, signature) {
+			if !ValidateSignature(channelSecret, signature, body) {
 				return echo.NewHTTPError(http.StatusBadRequest, "invalid signature")
 			}
 
@@ -39,10 +39,18 @@ func VerifyLineSignature(channelSecret string) echo.MiddlewareFunc {
 	}
 }
 
-func validateSignature(channelSecret string, body []byte, signature string) bool {
-	mac := hmac.New(sha256.New, []byte(channelSecret))
-	mac.Write(body)
-	expected := base64.StdEncoding.EncodeToString(mac.Sum(nil))
+// Reference: https://github.com/line/line-bot-sdk-go/blob/master/linebot/webhook/parse.go
+func ValidateSignature(channelSecret, signature string, body []byte) bool {
+	decoded, err := base64.StdEncoding.DecodeString(signature)
+	if err != nil {
+		return false
+	}
+	hash := hmac.New(sha256.New, []byte(channelSecret))
 
-	return hmac.Equal([]byte(expected), []byte(signature))
+	_, err = hash.Write(body)
+	if err != nil {
+		return false
+	}
+
+	return hmac.Equal(decoded, hash.Sum(nil))
 }
