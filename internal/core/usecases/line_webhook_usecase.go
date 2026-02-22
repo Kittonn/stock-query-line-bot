@@ -23,7 +23,7 @@ func (uc *LineWebhookUsecase) HandleEvent(ctx context.Context, event *domain.Lin
 	case domain.LineEventTypeMessage:
 		log.Printf("Handling message event: %s", event.Message)
 		symbol := event.Message
-		stockPrice, err := uc.stockUC.GetStockPrice(ctx, symbol)
+		stockPrice, err := uc.stockUC.GetStockSummary(ctx, symbol)
 		if err != nil {
 			log.Printf("Error getting stock price for symbol %s: %v", symbol, err)
 			return
