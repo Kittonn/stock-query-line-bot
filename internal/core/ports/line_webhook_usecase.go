@@ -7,5 +7,5 @@ import (
 )
 
 type LineWebhookUsecase interface {
-	HandleEvent(ctx context.Context, event domain.LineEvent)
+	HandleEvent(ctx context.Context, event *domain.LineEvent)
 }

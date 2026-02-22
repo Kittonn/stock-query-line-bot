@@ -13,6 +13,7 @@ type LineWebhookWorker struct {
 	queue         chan *domain.LineEvent
 	lineWebhookUC ports.LineWebhookUsecase
 	wg            sync.WaitGroup
+	once          sync.Once
 }
 
 func NewLineWebhookWorker(lineWebhookUC ports.LineWebhookUsecase) ports.LineWebhookWorker {
@@ -54,10 +55,13 @@ func (l *LineWebhookWorker) handle(ctx context.Context, workerID int, event *dom
 	}()
 
 	log.Printf("[worker %d] handling %s", workerID, event.Type)
-	l.lineWebhookUC.HandleEvent(ctx, *event)
+	l.lineWebhookUC.HandleEvent(ctx, event)
 }
 
 func (l *LineWebhookWorker) Stop() {
-	close(l.queue)
+	l.once.Do(func() {
+		close(l.queue)
+	})
+
 	l.wg.Wait()
 }
