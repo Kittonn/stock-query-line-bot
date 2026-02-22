@@ -8,4 +8,5 @@ import (
 
 type FinnHub interface {
 	GetStockPrice(ctx context.Context, symbol string) (*domain.StockPrice, error)
+	GetCompanyProfile(ctx context.Context, symbol string) (*domain.CompanyProfile, error)
 }

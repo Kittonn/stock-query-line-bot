@@ -18,7 +18,7 @@ func NewLineWebhookUsecase(stockUC ports.StockUsecase) ports.LineWebhookUsecase 
 	}
 }
 
-func (uc *LineWebhookUsecase) HandleEvent(ctx context.Context, event domain.LineEvent) {
+func (uc *LineWebhookUsecase) HandleEvent(ctx context.Context, event *domain.LineEvent) {
 	switch event.Type {
 	case domain.LineEventTypeMessage:
 		log.Printf("Handling message event: %s", event.Message)

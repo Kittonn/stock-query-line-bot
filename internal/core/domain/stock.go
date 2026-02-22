@@ -9,3 +9,18 @@ type StockPrice struct {
 	OpenPriceOfDay     float64
 	PreviousClosePrice float64
 }
+
+type CompanyProfile struct {
+	Country              string
+	Currency             string
+	Exchange             string
+	IPO                  string
+	MarketCapitalization float64
+	Name                 string
+	Phone                string
+	ShareOutstanding     float64
+	Ticker               string
+	WebURL               string
+	Logo                 string
+	FinnhubIndustry      string
+}
