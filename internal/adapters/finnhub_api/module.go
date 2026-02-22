@@ -1,4 +1,4 @@
-package finnhubapi
+package finnhub_api
 
 import "go.uber.org/fx"
 

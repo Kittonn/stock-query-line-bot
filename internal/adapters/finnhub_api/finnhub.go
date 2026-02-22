@@ -1,4 +1,4 @@
-package finnhubapi
+package finnhub_api
 
 import (
 	"context"
@@ -10,17 +10,6 @@ import (
 	"github.com/go-resty/resty/v2"
 	"github.com/sony/gobreaker/v2"
 )
-
-type Quote struct {
-	CurrentPrice        float64 `json:"c"`  // Current price
-	PriceChange         float64 `json:"d"`  // Change
-	PercentChange       float64 `json:"dp"` // Percent change
-	HighPriceOfDay      float64 `json:"h"`  // High price of the day
-	LowPriceOfDay       float64 `json:"l"`  // Low price of the day
-	OpenPriceOfDay      float64 `json:"o"`  // Open price of the day
-	PreviousClosePrice  float64 `json:"pc"` // Previous close price
-	TimestampUnixSecond int64   `json:"t"`  // Timestamp
-}
 
 type FinnhubAPI struct {
 	client  *resty.Client
@@ -47,6 +36,7 @@ func NewFinnhubAPI(cfg *config.Config, client *resty.Client) ports.FinnHub {
 
 func (f *FinnhubAPI) GetStockPrice(ctx context.Context, symbol string) (*domain.StockPrice, error) {
 	log.Printf("Attempting to get stock price for symbol: %s", symbol)
+
 	result, err := f.breaker.Execute(func() (*Quote, error) {
 		resp, err := f.client.R().
 			SetContext(ctx).
@@ -82,5 +72,40 @@ func (f *FinnhubAPI) GetStockPrice(ctx context.Context, symbol string) (*domain.
 		PreviousClosePrice: result.PreviousClosePrice,
 		PriceChange:        result.PriceChange,
 		PercentChange:      result.PercentChange,
+	}, nil
+}
+
+func (f *FinnhubAPI) GetCompanyProfile(ctx context.Context, symbol string) (*domain.CompanyProfile, error) {
+	resp, err := f.client.R().
+		SetContext(ctx).
+		SetQueryParams(map[string]string{
+			"symbol": symbol,
+		}).
+		SetHeader("X-Finnhub-Token", f.cfg.FinnhubAPIKey).
+		SetResult(&CompanyProfile{}).
+		Get(f.cfg.FinnhubAPIURL + "/stock/profile2")
+
+	if err != nil {
+		log.Printf("FinnHub HTTP request error: %v", err)
+		return nil, err
+	}
+
+	if resp.IsError() {
+		log.Printf("FinnHub HTTP response error. Status: %d, Body: %s", resp.StatusCode(), resp.String())
+		return nil, err
+	}
+
+	result := resp.Result().(*CompanyProfile)
+	return &domain.CompanyProfile{
+		Country:              result.Country,
+		Currency:             result.Currency,
+		Exchange:             result.Exchange,
+		IPO:                  result.IPO,
+		MarketCapitalization: result.MarketCapitalization,
+		Name:                 result.Name,
+		Phone:                result.Phone,
+		ShareOutstanding:     result.ShareOutstanding,
+		Logo:                 result.Logo,
+		FinnhubIndustry:      result.FinnhubIndustry,
 	}, nil
 }
