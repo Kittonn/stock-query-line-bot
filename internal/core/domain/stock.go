@@ -24,3 +24,20 @@ type CompanyProfile struct {
 	Logo                 string
 	FinnhubIndustry      string
 }
+
+type StockSummary struct {
+	// Stock price fields
+	CurrentPrice       float64
+	PriceChange        float64
+	PercentChange      float64
+	HighPriceOfDay     float64
+	LowPriceOfDay      float64
+	OpenPriceOfDay     float64
+	PreviousClosePrice float64
+
+	// Company profile fields
+	Name     string
+	Exchange string
+	Ticker   string
+	Currency string
+}
