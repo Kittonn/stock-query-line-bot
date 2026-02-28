@@ -46,7 +46,7 @@ func WithBoxPaddingBottom(padding string) BoxOption {
 	}
 }
 
-func WithBackgroundColor(color string) BoxOption {
+func WithBoxBackgroundColor(color string) BoxOption {
 	return func(c Component) {
 		c["backgroundColor"] = color
 	}

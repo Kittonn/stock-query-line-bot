@@ -53,10 +53,24 @@ func (e *Event) ToDomain() (*domain.LineEvent, error) {
 		return nil, err
 	}
 
-	return &domain.LineEvent{
-		Type:      t,
-		UserID:    e.Source.UserId,
-		Message:   e.Message.Text,
-		Timestamp: e.Timestamp,
-	}, nil
+	event := &domain.LineEvent{
+		Type:       t,
+		UserID:     e.Source.UserId,
+		Timestamp:  e.Timestamp,
+		ReplyToken: e.ReplyToken,
+	}
+
+	if e.Message != nil {
+		event.Message = &domain.MessagePayload{
+			Text: e.Message.Text,
+		}
+	}
+
+	if e.Postback != nil {
+		event.Postback = &domain.PostbackPayload{
+			Data: e.Postback.Data,
+		}
+	}
+
+	return event, nil
 }

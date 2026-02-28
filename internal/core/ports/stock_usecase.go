@@ -7,7 +7,5 @@ import (
 )
 
 type StockUsecase interface {
-	GetStockPrice(ctx context.Context, symbol string) (*domain.StockPrice, error)
-	GetCompanyProfile(ctx context.Context, symbol string) (*domain.CompanyProfile, error)
 	GetStockSummary(ctx context.Context, symbol string) (*domain.StockSummary, error)
 }

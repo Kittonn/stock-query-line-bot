@@ -56,3 +56,9 @@ func WithTextFlex(flex int) TextOption {
 		c["flex"] = flex
 	}
 }
+
+func WithTextAdjustMode(mode string) TextOption {
+	return func(c Component) {
+		c["adjustMode"] = mode
+	}
+}
