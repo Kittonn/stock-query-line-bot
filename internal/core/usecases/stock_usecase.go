@@ -49,6 +49,7 @@ func (s *StockUsecase) GetStockSummary(ctx context.Context, symbol string) (*dom
 			LowPriceOfDay:      stockPrice.LowPriceOfDay,
 			OpenPriceOfDay:     stockPrice.OpenPriceOfDay,
 			PreviousClosePrice: stockPrice.PreviousClosePrice,
+			
 			Name:               companyProfile.Name,
 			Exchange:           companyProfile.Exchange,
 			Ticker:             companyProfile.Ticker,
