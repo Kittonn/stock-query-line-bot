@@ -9,11 +9,22 @@ const (
 	LineEventTypePostback LineEventType = "postback"
 )
 
+type MessagePayload struct {
+	Text string
+}
+
+type PostbackPayload struct {
+	Data string
+}
+
 type LineEvent struct {
-	Type      LineEventType
-	UserID    string
-	Message   string
-	Timestamp int64
+	Type       LineEventType
+	UserID     string
+	Timestamp  int64
+	ReplyToken string
+
+	Message  *MessagePayload
+	Postback *PostbackPayload
 }
 
 func ParseLineEventType(s string) (LineEventType, error) {
