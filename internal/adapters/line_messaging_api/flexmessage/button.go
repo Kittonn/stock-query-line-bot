@@ -32,3 +32,11 @@ func WithButtonColor(color string) ButtonOption {
 		c["color"] = color
 	}
 }
+
+func NewURIAction(label, uri string) Component {
+	return Component{
+		"type":  "uri",
+		"label": label,
+		"uri":   uri,
+	}
+}

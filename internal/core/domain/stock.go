@@ -22,6 +22,7 @@ type CompanyProfile struct {
 	Ticker               string
 	WebURL               string
 	Logo                 string
+	EstimateCurrency     string
 	FinnhubIndustry      string
 }
 
@@ -36,8 +37,9 @@ type StockSummary struct {
 	PreviousClosePrice float64
 
 	// Company profile fields
-	Name     string
-	Exchange string
-	Ticker   string
-	Currency string
+	Name             string
+	Exchange         string
+	Ticker           string
+	Currency         string
+	EstimateCurrency string
 }

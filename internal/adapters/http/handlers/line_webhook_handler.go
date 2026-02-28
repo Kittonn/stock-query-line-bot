@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/Kittonn/stock-query-line-bot/internal/adapters/http/handlers/dto"
@@ -37,7 +37,7 @@ func (h *LineWebhookHandler) processEvents(events []dto.Event) {
 			continue
 		}
 
-		fmt.Printf("Received event: %s %s\n", domainEvent.Type, domainEvent.Message)
+		log.Printf("Received event: %s %s\n", domainEvent.Type, domainEvent.Message)
 		h.lineWebhookWorker.Enqueue(domainEvent)
 	}
 }

@@ -107,5 +107,7 @@ func (f *FinnhubAPI) GetCompanyProfile(ctx context.Context, symbol string) (*dom
 		ShareOutstanding:     result.ShareOutstanding,
 		Logo:                 result.Logo,
 		FinnhubIndustry:      result.FinnhubIndustry,
+		Ticker:               result.Ticker,
+		EstimateCurrency:     result.EstimateCurrency,
 	}, nil
 }

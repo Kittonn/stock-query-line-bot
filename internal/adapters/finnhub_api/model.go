@@ -24,4 +24,5 @@ type CompanyProfile struct {
 	WebURL               string  `json:"weburl"`
 	Logo                 string  `json:"logo"`
 	FinnhubIndustry      string  `json:"finnhubIndustry"`
+	EstimateCurrency     string  `json:"estimateCurrency"`
 }
