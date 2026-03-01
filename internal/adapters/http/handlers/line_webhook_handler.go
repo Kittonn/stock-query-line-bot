@@ -1,21 +1,23 @@
 package handlers
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/Kittonn/stock-query-line-bot/internal/adapters/http/handlers/dto"
 	"github.com/Kittonn/stock-query-line-bot/internal/core/ports"
+	"github.com/Kittonn/stock-query-line-bot/pkg/logger"
 	"github.com/labstack/echo/v5"
 )
 
 type LineWebhookHandler struct {
 	lineWebhookWorker ports.LineWebhookWorker
+	log               logger.Logger
 }
 
-func NewLineWebhookHandler(lineWebhookWorker ports.LineWebhookWorker) *LineWebhookHandler {
+func NewLineWebhookHandler(lineWebhookWorker ports.LineWebhookWorker, log logger.Logger) *LineWebhookHandler {
 	return &LineWebhookHandler{
 		lineWebhookWorker: lineWebhookWorker,
+		log:               log,
 	}
 }
 
@@ -34,10 +36,11 @@ func (h *LineWebhookHandler) processEvents(events []dto.Event) {
 	for _, event := range events {
 		domainEvent, err := event.ToDomain()
 		if err != nil {
+			h.log.Warn("failed to parse event: ", err)
 			continue
 		}
 
-		log.Printf("Received event: %s %s\n", domainEvent.Type, domainEvent.Message)
+		h.log.Info("received event: ", domainEvent.Type)
 		h.lineWebhookWorker.Enqueue(domainEvent)
 	}
 }
