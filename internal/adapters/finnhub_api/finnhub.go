@@ -2,11 +2,11 @@ package finnhub_api
 
 import (
 	"context"
-	"log"
 
 	"github.com/Kittonn/stock-query-line-bot/internal/config"
 	"github.com/Kittonn/stock-query-line-bot/internal/core/domain"
 	"github.com/Kittonn/stock-query-line-bot/internal/core/ports"
+	"github.com/Kittonn/stock-query-line-bot/pkg/logger"
 	"github.com/go-resty/resty/v2"
 	"github.com/sony/gobreaker/v2"
 )
@@ -15,13 +15,14 @@ type FinnhubAPI struct {
 	client  *resty.Client
 	breaker *gobreaker.CircuitBreaker[*Quote]
 	cfg     *config.Config
+	log     logger.Logger
 }
 
-func NewFinnhubAPI(cfg *config.Config, client *resty.Client) ports.FinnHub {
-
+func NewFinnhubAPI(cfg *config.Config, client *resty.Client, log logger.Logger) ports.FinnHub {
 	return &FinnhubAPI{
 		cfg:    cfg,
 		client: client,
+		log:    log,
 		breaker: gobreaker.NewCircuitBreaker[*Quote](gobreaker.Settings{
 			Name:         "finnhub",
 			Timeout:      cfg.CircuitBreakerOpenStateTimeout,
@@ -35,7 +36,7 @@ func NewFinnhubAPI(cfg *config.Config, client *resty.Client) ports.FinnHub {
 }
 
 func (f *FinnhubAPI) GetStockPrice(ctx context.Context, symbol string) (*domain.StockPrice, error) {
-	log.Printf("Attempting to get stock price for symbol: %s", symbol)
+	f.log.Info("fetching stock price for symbol: ", symbol)
 
 	result, err := f.breaker.Execute(func() (*Quote, error) {
 		resp, err := f.client.R().
@@ -48,12 +49,12 @@ func (f *FinnhubAPI) GetStockPrice(ctx context.Context, symbol string) (*domain.
 			Get(f.cfg.FinnhubAPIURL + "/quote")
 
 		if err != nil {
-			log.Printf("FinnHub HTTP request error: %v", err)
+			f.log.Error("finnhub request error: ", err)
 			return nil, err
 		}
 
 		if resp.IsError() {
-			log.Printf("FinnHub HTTP response error. Status: %d, Body: %s", resp.StatusCode(), resp.String())
+			f.log.Error("finnhub response error status: ", resp.StatusCode(), " body: ", resp.String())
 			return nil, err
 		}
 
@@ -76,6 +77,8 @@ func (f *FinnhubAPI) GetStockPrice(ctx context.Context, symbol string) (*domain.
 }
 
 func (f *FinnhubAPI) GetCompanyProfile(ctx context.Context, symbol string) (*domain.CompanyProfile, error) {
+	f.log.Info("fetching company profile for symbol: ", symbol)
+
 	resp, err := f.client.R().
 		SetContext(ctx).
 		SetQueryParams(map[string]string{
@@ -86,12 +89,12 @@ func (f *FinnhubAPI) GetCompanyProfile(ctx context.Context, symbol string) (*dom
 		Get(f.cfg.FinnhubAPIURL + "/stock/profile2")
 
 	if err != nil {
-		log.Printf("FinnHub HTTP request error: %v", err)
+		f.log.Error("finnhub request error: ", err)
 		return nil, err
 	}
 
 	if resp.IsError() {
-		log.Printf("FinnHub HTTP response error. Status: %d, Body: %s", resp.StatusCode(), resp.String())
+		f.log.Error("finnhub response error status: ", resp.StatusCode(), " body: ", resp.String())
 		return nil, err
 	}
 

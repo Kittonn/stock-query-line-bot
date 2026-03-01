@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/Kittonn/stock-query-line-bot/internal/config"
+	"github.com/Kittonn/stock-query-line-bot/pkg/logger"
 	"github.com/labstack/echo/v5"
 	"go.uber.org/fx"
 )
@@ -20,7 +21,7 @@ func NewHTTPServer(e *echo.Echo, cfg *config.Config) *http.Server {
 	}
 }
 
-func RunHTTPServer(lc fx.Lifecycle, srv *http.Server) {
+func RunHTTPServer(lc fx.Lifecycle, srv *http.Server, log logger.Logger) {
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			go func() {
@@ -28,6 +29,8 @@ func RunHTTPServer(lc fx.Lifecycle, srv *http.Server) {
 					panic(err)
 				}
 			}()
+
+			log.Info("Starting HTTP server on port ", srv.Addr)
 
 			return nil
 		},

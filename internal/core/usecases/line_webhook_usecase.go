@@ -2,22 +2,24 @@ package usecases
 
 import (
 	"context"
-	"log"
 
 	"github.com/Kittonn/stock-query-line-bot/internal/adapters/line_messaging_api/flexmessage/cards"
 	"github.com/Kittonn/stock-query-line-bot/internal/core/domain"
 	"github.com/Kittonn/stock-query-line-bot/internal/core/ports"
+	"github.com/Kittonn/stock-query-line-bot/pkg/logger"
 )
 
 type LineWebhookUsecase struct {
 	stockUC          ports.StockUsecase
 	lineMessagingAPI ports.LineMessagingAPI
+	log              logger.Logger
 }
 
-func NewLineWebhookUsecase(stockUC ports.StockUsecase, lineMessagingAPI ports.LineMessagingAPI) ports.LineWebhookUsecase {
+func NewLineWebhookUsecase(stockUC ports.StockUsecase, lineMessagingAPI ports.LineMessagingAPI, log logger.Logger) ports.LineWebhookUsecase {
 	return &LineWebhookUsecase{
 		stockUC:          stockUC,
 		lineMessagingAPI: lineMessagingAPI,
+		log:              log,
 	}
 }
 
@@ -36,11 +38,9 @@ func (uc *LineWebhookUsecase) handleMessage(ctx context.Context, event *domain.L
 	symbol := event.Message.Text
 	stock, err := uc.stockUC.GetStockSummary(ctx, symbol)
 	if err != nil {
-		log.Printf("Error getting stock price for symbol %s: %v", symbol, err)
+		uc.log.Error("failed to get stock summary symbol: ", symbol, " error: ", err)
 		return
 	}
-
-	log.Printf("stock: %+v", stock)
 
 	card := cards.BuildStockCard(stock)
 
@@ -49,10 +49,12 @@ func (uc *LineWebhookUsecase) handleMessage(ctx context.Context, event *domain.L
 	})
 
 	if err != nil {
-		log.Printf("Error replying to LINE message: %v", err)
+		uc.log.Error("failed to reply to LINE message symbol: ", symbol, " error: ", err)
+		return
 	}
 
-	log.Printf("Replied with stock summary for %s", symbol)
+	uc.log.Info("replied with stock summary symbol: ", symbol)
+
 }
 
 func (uc *LineWebhookUsecase) handlePostback(ctx context.Context, event *domain.LineEvent) {

@@ -9,6 +9,7 @@ import (
 	"github.com/Kittonn/stock-query-line-bot/internal/config"
 	"github.com/Kittonn/stock-query-line-bot/internal/core/usecases"
 	"github.com/Kittonn/stock-query-line-bot/internal/infrastructure"
+	"github.com/Kittonn/stock-query-line-bot/pkg/logger"
 	"go.uber.org/fx"
 )
 
@@ -22,5 +23,6 @@ func main() {
 		infrastructure.Module,
 		cache.Module,
 		usecases.Module,
+		logger.Module,
 	).Run()
 }

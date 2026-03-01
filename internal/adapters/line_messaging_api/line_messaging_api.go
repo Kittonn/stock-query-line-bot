@@ -8,12 +8,14 @@ import (
 	"github.com/Kittonn/stock-query-line-bot/internal/config"
 	"github.com/Kittonn/stock-query-line-bot/internal/core/domain"
 	"github.com/Kittonn/stock-query-line-bot/internal/core/ports"
+	"github.com/Kittonn/stock-query-line-bot/pkg/logger"
 	"github.com/go-resty/resty/v2"
 )
 
 type LineMessagingAPI struct {
 	cfg   *config.Config
 	resty *resty.Client
+	log   logger.Logger
 }
 
 type ReplyMessageResponse struct {
@@ -30,14 +32,19 @@ type ReplyMessageRequest struct {
 	Messages   []any  `json:"messages"`
 }
 
-func NewLineMessagingAPI(cfg *config.Config, client *resty.Client) ports.LineMessagingAPI {
+var _ ports.LineMessagingAPI = (*LineMessagingAPI)(nil)
+
+func NewLineMessagingAPI(cfg *config.Config, client *resty.Client, log logger.Logger) ports.LineMessagingAPI {
 	return &LineMessagingAPI{
 		cfg:   cfg,
 		resty: client,
+		log:   log,
 	}
 }
 
 func (l *LineMessagingAPI) Reply(ctx context.Context, replyToken string, messages []domain.Message) error {
+	l.log.Info("replying to line message with replyToken: ", replyToken, " messages: ", len(messages))
+
 	msgs := make([]any, len(messages))
 	for i, msg := range messages {
 		msgs[i] = msg
@@ -56,12 +63,17 @@ func (l *LineMessagingAPI) Reply(ctx context.Context, replyToken string, message
 		Post(l.cfg.LineMessagingAPIURL + "/v2/bot/message/reply")
 
 	if err != nil {
+		l.log.Error("line messaging api request failed: ", err)
+
 		return err
 	}
 
 	if resp.IsError() {
+		l.log.Error("line api error status: ", resp.Status(), " body: ", resp.String())
+
 		return fmt.Errorf("line api error: %s body: %s", resp.Status(), resp.String())
 	}
 
+	l.log.Info("line message replied successfully replyToken: ", replyToken)
 	return nil
 }
